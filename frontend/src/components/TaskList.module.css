@@ -1,0 +1,139 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Header Row */
+.header {
+  display: grid;
+  grid-template-columns: 1fr 120px 110px 140px 140px;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg-elevated);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Data Row */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 120px 110px 140px 140px;
+  gap: 12px;
+  padding: 14px 20px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-fast);
+  animation: fadeIn 300ms ease-out both;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--bg-elevated);
+}
+
+/* Title Column */
+.titleLink {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
+  display: block;
+}
+
+.titleLink:hover {
+  color: var(--accent-primary);
+}
+
+.desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
+}
+
+.owner {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: block;
+}
+
+/* Date Column */
+.colDate {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.overdue {
+  color: var(--priority-high);
+  font-weight: 500;
+}
+
+.overdueTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.noDate {
+  color: var(--text-muted);
+}
+
+/* Actions Column */
+.colActions {
+  display: flex;
+  gap: 6px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Responsive: collapse to card-like rows on mobile ── */
+@media (max-width: 768px) {
+  .header {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .colTitle {
+    grid-column: 1 / -1;
+  }
+
+  .colActions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .desc {
+    max-width: none;
+  }
+}

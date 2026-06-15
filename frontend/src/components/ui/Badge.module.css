@@ -1,0 +1,48 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Status variants */
+.status-todo {
+  background: var(--status-todo-bg);
+  color: var(--status-todo);
+}
+
+.status-in-progress {
+  background: var(--status-progress-bg);
+  color: var(--status-progress);
+}
+
+.status-done {
+  background: var(--status-done-bg);
+  color: var(--status-done);
+}
+
+/* Priority variants */
+.priority-low {
+  background: var(--priority-low-bg);
+  color: var(--priority-low);
+}
+
+.priority-medium {
+  background: var(--priority-medium-bg);
+  color: #d4a017;
+}
+
+.priority-high {
+  background: var(--priority-high-bg);
+  color: var(--priority-high);
+}
+
+/* Role variant */
+.role-admin {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
