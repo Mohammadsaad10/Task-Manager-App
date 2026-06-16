@@ -185,6 +185,32 @@ npm test
 | GET | `/api/admin/tasks` | Admin | All users' tasks |
 | GET | `/api/health` | No | Health check + DB status |
 
+## 📌 Assumptions
+
+1. **Single-user sessions** — Each user is expected to be logged in from one device/browser at a time. The JWT-based auth does not track or invalidate sessions across multiple devices.
+2. **Low-to-moderate traffic** — The application is designed for small-to-medium teams. The in-memory SSE client map and single-server architecture assume fewer than ~1,000 concurrent users.
+3. **Neon serverless PostgreSQL** — The database is hosted on Neon. Cold starts may cause the first request after inactivity to be slightly slower (~1-2s). This is a known Neon characteristic, not a bug.
+4. **Cloudinary for file storage** — File uploads go directly to Cloudinary. The system assumes a valid Cloudinary account is configured. Without it, all other features still work — only file attachments will fail.
+5. **Modern browser support** — The frontend targets modern browsers (Chrome, Firefox, Safari, Edge — latest 2 versions). No polyfills are provided for IE11 or legacy browsers.
+6. **Due date validation** — Due dates cannot be set in the past (must be today or later). This is by design to prevent backdating tasks.
+7. **Admin role is seeded** — The admin user is created via the seed script. There is no self-service admin registration — admin accounts must be created via the database seed or direct DB manipulation.
+8. **No email verification** — Signup does not require email verification. This was scoped out to focus on core task management functionality.
+
+## ⚖️ Trade-offs
+
+| Decision | What we chose | Alternative | Why |
+|----------|--------------|-------------|-----|
+| **Auth storage** | HTTP-only cookies | localStorage / sessionStorage | Cookies are immune to XSS token theft. The trade-off is added CORS complexity (`credentials: true`, `sameSite` settings) and inability to read the token in client-side JS. Security outweighs convenience. |
+| **Real-time updates** | Server-Sent Events (SSE) | WebSockets | SSE is simpler, works over HTTP/1.1, requires no special server setup, and is sufficient for one-way server→client notifications. WebSockets would be overkill for "task updated" events since the client never pushes real-time data to the server. |
+| **In-memory SSE store** | `Map<string, SSEClient>` | Redis Pub/Sub | An in-memory map is simple and zero-dependency. The trade-off is that it only works on a single server instance. If horizontal scaling is needed, Redis Pub/Sub would be required. For the current scope, single-server is sufficient. |
+| **Express 5 type casts** | `as any` with comments | Downgrade to Express 4 / custom type wrappers | Express 5 has stricter middleware types that community packages haven't fully adopted. We used documented `as any` casts rather than writing complex generic wrappers. The runtime behavior is correct — only the TypeScript types are mismatched. |
+| **Prisma with Neon adapter** | `@prisma/adapter-pg` | Direct Prisma connection string | Neon's serverless architecture requires the adapter pattern for connection pooling. This adds a constructor cast (`as any`) but is Prisma's own recommended approach for serverless databases. |
+| **CSS Modules** | Scoped CSS Modules | Tailwind CSS / styled-components | CSS Modules provide scoped styles without a runtime cost and keep full CSS flexibility. The trade-off is more verbose class definitions compared to utility-first approaches like Tailwind. |
+| **No pagination caching** | Refetch on every filter/page change | React Query / SWR caching | Keeps the codebase simpler with fewer dependencies. The trade-off is redundant API calls when revisiting previously loaded pages. For small datasets this is negligible. |
+| **Single monorepo** | One Git repo for frontend + backend | Separate repos | Simpler to manage, deploy, and review for a project of this size. The trade-off is tighter coupling and larger clone size. Separate repos would make sense at enterprise scale. |
+| **Rate limiting (in-memory)** | `express-rate-limit` default store | Redis-backed store | The default in-memory store works on a single server and resets on restart. For multi-instance deployments, a Redis store would be needed to share rate limit counters. |
+| **No refresh tokens** | Single JWT with 7-day expiry | Access + refresh token rotation | Simplifies auth flow. The trade-off is that token revocation requires waiting for expiry (no instant logout from all devices). Refresh token rotation would add security but significantly increase complexity. |
+
 ## 📄 License
 
 ISC
