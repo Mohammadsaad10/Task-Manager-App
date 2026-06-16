@@ -25,6 +25,9 @@ configureCloudinary();
 // Create Express app
 const app = express();
 
+// Trust reverse proxies (Render, AWS, etc.) — required for rate limiting behind proxies
+app.set('trust proxy', 1);
+
 // ---------------------
 // Global Middleware
 // ---------------------
